@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django import VERSION as DJANGO_VERSION
 from django.forms.utils import flatatt
 from django.forms.widgets import DateTimeInput
 from django.utils import translation
@@ -125,9 +126,12 @@ class DateTimePicker(DateTimeInput):
         if value is None:
             value = ''
 
-        base_attrs = self.attrs.copy()
-        base_attrs.update({'type': self.input_type, 'name': name})
-        input_attrs = self.build_attrs(base_attrs, extra_attrs=attrs)
+        if DJANGO_VERSION < (1, 11):
+            input_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+        else:
+            base_attrs = self.attrs.copy()
+            base_attrs.update({'type': self.input_type, 'name': name})
+            input_attrs = self.build_attrs(base_attrs, extra_attrs=attrs)
 
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
